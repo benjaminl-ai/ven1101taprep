@@ -6,58 +6,52 @@
     <title>VE1A Troubleshooting</title>
     <style>
         :root { --primary: #e63946; --dark: #1d3557; --glass: rgba(255,255,255,0.7); --bg: #f1faee; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; scale: 0.95; transform-origin: top; }
         
-        .header { background: var(--dark); color: white; width: 100%; padding: 15px 0; text-align: center; }
-        .header h1 { font-size: 1.4rem; margin: 0 0 10px 0; }
-        .instruction-box { font-size: 0.85rem; display: inline-block; text-align: left; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 8px; line-height: 1.4; }
-        .step { display: flex; gap: 10px; }
-        .step span { min-width: 110px; display: inline-block; border-right: 1px solid #555; margin-right: 5px; }
+        /* 標題與指引 */
+        .header { background: var(--dark); color: white; width: 100%; padding: 10px 0; text-align: center; }
+        .header h1 { font-size: 1.1rem; margin: 0 0 5px 0; }
+        .instruction-box { font-size: 0.75rem; display: inline-block; text-align: left; background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 6px; }
+        .step { display: flex; gap: 8px; }
+        .step span { min-width: 90px; border-right: 1px solid #555; }
 
-        /* 間隔一行 */
-        .spacer { height: 20px; }
+        /* Troubleshooting 清單 - 靜態顯示 */
+        .troubleshoot-list { width: 92%; background: white; border: 1.5px solid var(--dark); border-radius: 8px; margin: 10px 0; padding: 8px; box-sizing: border-box; }
+        .troubleshoot-list h2 { font-size: 0.9rem; margin: 0 0 5px 0; text-align: center; border-bottom: 1px solid #eee; }
+        .troubleshoot-list ul { margin: 0; padding-left: 18px; font-size: 0.75rem; list-style-type: square; }
 
-        .troubleshooting-area { width: 90%; background: white; border: 2px solid var(--dark); border-radius: 10px; overflow: hidden; }
-        .troubleshooting-area summary { background: var(--dark); color: white; padding: 10px; font-weight: bold; cursor: pointer; text-align: center; }
-        .troubleshooting-area ul { margin: 10px; padding-left: 25px; font-size: 0.85rem; line-height: 1.6; }
-
-        /* 扭蛋機 */
-        .machine-wrap { position: relative; width: 240px; height: 320px; margin: 20px 0; }
+        /* 縮小版扭蛋機 */
+        .machine-wrap { position: relative; width: 180px; height: 240px; margin: 10px 0; }
         .gacha-body { 
             width: 100%; height: 100%; background: var(--primary); 
-            border: 5px solid var(--dark); border-radius: 70px 70px 25px 25px;
+            border: 4px solid var(--dark); border-radius: 50px 50px 15px 15px;
             position: relative; z-index: 5;
         }
         .gacha-glass {
-            width: 190px; height: 140px; background: var(--glass);
-            border: 4px solid var(--dark); border-radius: 60px 60px 15px 15px;
-            position: absolute; top: 18px; left: 21px; display: flex; justify-content: center; align-items: center; gap: 10px;
+            width: 140px; height: 100px; background: var(--glass);
+            border: 3px solid var(--dark); border-radius: 40px 40px 10px 10px;
+            position: absolute; top: 15px; left: 17px; display: flex; justify-content: center; align-items: center; gap: 5px;
         }
-        
-        /* 四粒蛋 */
-        .top-capsule { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--dark); transition: opacity 0.3s; }
-        
-        /* 下方出現的蛋 */
+        .top-capsule { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--dark); transition: opacity 0.3s; }
         .bottom-capsule {
-            width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--dark);
-            position: absolute; bottom: 20px; left: 95px; z-index: 10;
-            display: none; /* 預設隱藏 */
+            width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--dark);
+            position: absolute; bottom: 12px; left: 71px; z-index: 10; display: none;
         }
 
         .knob {
-            width: 60px; height: 60px; background: #fff; border: 5px solid var(--dark);
-            border-radius: 50%; position: absolute; bottom: 85px; left: 85px;
-            cursor: pointer; z-index: 10; transition: transform 0.4s ease-in-out;
+            width: 45px; height: 45px; background: #fff; border: 4px solid var(--dark);
+            border-radius: 50%; position: absolute; bottom: 65px; left: 63px;
+            cursor: pointer; z-index: 10; transition: transform 0.4s;
         }
-        .knob::after { content: ''; position: absolute; width: 40px; height: 10px; background: var(--dark); top: 20px; left: 5px; border-radius: 5px; }
+        .knob::after { content: ''; position: absolute; width: 30px; height: 8px; background: var(--dark); top: 15px; left: 4px; border-radius: 4px; }
         .spin { transform: rotate(180deg); }
-        .exit { width: 85px; height: 55px; background: var(--dark); position: absolute; bottom: 15px; left: 73px; border-radius: 12px; z-index: 6; }
+        .exit { width: 60px; height: 40px; background: var(--dark); position: absolute; bottom: 8px; left: 56px; border-radius: 8px; z-index: 6; }
 
-        #feedback { height: 40px; margin: 5px; font-size: 1rem; font-weight: bold; text-align: center; color: var(--dark); }
+        #feedback { height: 35px; font-size: 0.85rem; font-weight: bold; text-align: center; color: var(--dark); margin: 5px; }
         #recordBtn {
-            background: #2a9d8f; color: white; border: none; padding: 15px 40px;
-            border-radius: 35px; font-size: 1.1rem; cursor: pointer; display: none;
-            box-shadow: 0 5px 0 #1e7066; margin-bottom: 20px;
+            background: #2a9d8f; color: white; border: none; padding: 10px 30px;
+            border-radius: 25px; font-size: 0.95rem; cursor: pointer; display: none;
+            box-shadow: 0 4px 0 #1e7066;
         }
     </style>
 </head>
@@ -72,18 +66,15 @@
         </div>
     </div>
 
-    <div class="spacer"></div>
-
-    <details class="troubleshooting-area" open>
-        <summary>Troubleshooting List (溫習清單)</summary>
+    <div class="troubleshoot-list">
+        <h2>Troubleshooting</h2>
         <ul id="studyList"></ul>
-    </details>
+    </div>
 
     <div class="machine-wrap">
         <div id="outCapsule" class="bottom-capsule"></div>
-        
         <div class="gacha-body">
-            <div class="gacha-glass" id="glass">
+            <div class="gacha-glass">
                 <div class="top-capsule" style="background:#ffadad"></div>
                 <div class="top-capsule" style="background:#ffd6a5"></div>
                 <div class="top-capsule" style="background:#caffbf"></div>
@@ -94,14 +85,14 @@
         </div>
     </div>
 
-    <div id="feedback">Click to start! 撳掣開始</div>
+    <div id="feedback">Click knob to start! / 撳掣開始</div>
     <button id="recordBtn">🎤 Answer / 錄音</button>
 
 <script>
     const QA = [
         { q: "the machine overheats", a: "let it cool down" },
         { q: "the machine stops working", a: "check the power supply" },
-        { q: "there is a jammed paper", a: "pull it out gently" },
+        { q: "there is jammed paper", a: "pull it out gently" },
         { q: "there is a strange noise", a: "turn off the shredder" }
     ];
 
@@ -136,20 +127,15 @@
 
         setTimeout(() => {
             knob.classList.remove('spin');
-            
-            // 隨機選一粒蛋消失
-            const randomIndex = Math.floor(Math.random() * 4);
-            topCapsules[randomIndex].style.opacity = "0";
-            
-            // 下面出現蛋
-            outCapsule.style.background = topCapsules[randomIndex].style.background;
+            const r = Math.floor(Math.random() * 4);
+            topCapsules[r].style.opacity = "0";
+            outCapsule.style.background = topCapsules[r].style.background;
             outCapsule.style.display = "block";
 
             const task = QA[Math.floor(Math.random() * QA.length)];
             currentA = task.a;
-            
             speak(`What should I do if ${task.q}?`);
-            feedback.innerHTML = "Question out! 請回答";
+            feedback.innerHTML = "Listen! / 請回答";
             recordBtn.style.display = "block";
         }, 600);
     };
@@ -158,7 +144,7 @@
     if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
         recognition.lang = 'en-US';
-        recognition.continuous = false; // 錄完一句自動停
+        recognition.continuous = false;
 
         recordBtn.onclick = () => {
             recognition.start();
@@ -168,32 +154,22 @@
 
         recognition.onresult = (event) => {
             const userSpeech = event.results[0][0].transcript.toLowerCase();
-            recognition.stop(); // 攞到結果即刻熄 Mic
-            resetBtn();
+            recognition.stop();
+            recordBtn.innerText = "🎤 Answer / 錄音";
+            recordBtn.disabled = false;
             
             if (userSpeech.includes(currentA.toLowerCase())) {
                 feedback.innerHTML = `<span style="color:green">✔ Correct! 正確!</span>`;
                 speak("Excellent!");
                 recordBtn.style.display = "none";
             } else {
-                feedback.innerHTML = `<span style="color:red">✘ Try again!</span><br><small>You said: ${userSpeech}</small>`;
+                feedback.innerHTML = `<span style="color:red">✘ Try again!</span><br><small>Said: ${userSpeech}</small>`;
+                recordBtn.disabled = false;
             }
         };
 
-        recognition.onspeechend = () => {
-            recognition.stop(); // 停止講嘢自動熄 Mic
-            resetBtn();
-        };
-
-        recognition.onerror = () => {
-            recognition.stop();
-            resetBtn();
-        };
-
-        function resetBtn() {
-            recordBtn.innerText = "🎤 Answer / 錄音";
-            recordBtn.disabled = false;
-        }
+        recognition.onspeechend = () => { recognition.stop(); recordBtn.disabled = false; recordBtn.innerText = "🎤 Answer / 錄音"; };
+        recognition.onerror = () => { recognition.stop(); recordBtn.disabled = false; recordBtn.innerText = "🎤 Answer / 錄音"; };
     }
 </script>
 </body>
