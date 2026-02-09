@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Speaking Practice</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; border: none; background-color: #007bff; color: white; margin: 10px; }
+        button:disabled { background-color: #ccc; }
+        #feedback { margin-top: 20px; font-weight: bold; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Office Safety Q&A</h2>
+    <p>Step 1: Click "Ask Question"</p>
+    <button id="askBtn">Ask Question</button>
+    
+    <div id="questionArea" style="margin: 20px; font-style: italic; color: #555;"></div>
+
+    <p>Step 2: Hold "Record Answer" and speak</p>
+    <button id="recordBtn" disabled>🎤 Record Answer</button>
+    
+    <div id="feedback"></div>
+    <p id="score">Completed: 0/4</p>
+</div>
+
+<script>
+    const QA_PAIRS = [
+        { q: "the machine overheats", a: "let it cool down" },
+        { q: "the machine stops working", a: "check the power supply" },
+        { q: "there is a jammed paper", a: "pull it out gently" },
+        { q: "there is a strange noise", a: "turn off the shredder" }
+    ];
+
+    let remaining = [...QA_PAIRS];
+    let currentQA = null;
+    let completedCount = 0;
+
+    const askBtn = document.getElementById('askBtn');
+    const recordBtn = document.getElementById('recordBtn');
+    const feedback = document.getElementById('feedback');
+    const questionArea = document.getElementById('questionArea');
+
+    // 語音合成 (TTS)
+    function speak(text) {
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-US';
+        window.speechSynthesis.speak(msg);
+    }
+
+    askBtn.onclick = () => {
+        if (remaining.length === 0) {
+            feedback.innerHTML = "Well done! You've finished all questions.";
+            return;
+        }
+        const index = Math.floor(Math.random() * remaining.length);
+        currentQA = remaining[index];
+        const questionText = `What should I do if ${currentQA.q}?`;
+        questionArea.innerText = questionText;
+        speak(questionText);
+        recordBtn.disabled = false;
+        feedback.innerText = "";
+    };
+
+    // 語音辨識 (STT)
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+
+    recordBtn.onclick = () => {
+        recognition.start();
+        feedback.innerText = "Listening...";
+    };
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript.toLowerCase();
+        const targetAnswer = currentQA.a.toLowerCase();
+        
+        // 簡單的比對邏輯
+        if (transcript.includes(targetAnswer) || targetAnswer.includes(transcript)) {
+            feedback.innerHTML = `<span class="success">Correct!</span><br>You said: "${transcript}"`;
+            remaining = remaining.filter(i => i !== currentQA);
+            completedCount++;
+            document.getElementById('score').innerText = `Completed: ${completedCount}/4`;
+            recordBtn.disabled = true;
+        } else {
+            feedback.innerHTML = `<span class="error">Try again.</span><br>You said: "${transcript}"<br>Expected: "${currentQA.a}"`;
+        }
+    };
+</script>
+</body>
+</html>
