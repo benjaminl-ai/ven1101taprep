@@ -12,7 +12,7 @@
             height: 100vh; width: 100vw; overflow: hidden;
         }
         
-        /* 第一行 Instructions */
+        /* 指引 */
         .instruction-header { 
             background: var(--dark); color: #a8dadc; width: 100%; padding: 15px 0; 
             display: flex; justify-content: center; gap: 20px; flex-shrink: 0;
@@ -20,10 +20,10 @@
         }
         .instruction-header div { display: flex; flex-direction: column; }
 
-        /* Troubleshooting 清單 */
+        /* 清單 */
         .troubleshoot-list { 
             width: 94%; background: white; border: 2px solid var(--dark); border-radius: 10px; 
-            margin: 10px 0; padding: 10px; box-sizing: border-box; flex-shrink: 0; 
+            margin: 15px 0; padding: 10px; box-sizing: border-box; flex-shrink: 0; 
         }
         .troubleshoot-list h2 { font-size: 1rem; margin: 0 0 5px 0; text-align: center; border-bottom: 2px solid #eee; }
         .troubleshoot-list ul { margin: 0; padding-left: 20px; font-size: 0.9rem; list-style-type: disc; line-height: 1.3; }
@@ -31,57 +31,61 @@
         /* 遊戲區域 */
         .game-container { 
             flex-grow: 1; display: flex; flex-direction: column; 
-            justify-content: flex-start; align-items: center; width: 100%;
-        }
-
-        /* 搬上嚟嘅 Feedback Prompt */
-        #feedback { 
-            font-size: 1.1rem; font-weight: bold; color: var(--dark); 
-            margin: 5px 0; min-height: 2.8em; text-align: center; width: 90%;
-            display: flex; align-items: center; justify-content: center;
+            justify-content: center; align-items: center; width: 100%;
         }
         
         /* 扭蛋機 */
-        .machine-wrap { position: relative; width: 210px; height: 260px; margin-bottom: 10px; }
+        .machine-wrap { position: relative; width: 220px; height: 280px; margin-bottom: 20px; }
         .gacha-body { 
             width: 100%; height: 100%; background: var(--primary); 
-            border: 4px solid var(--dark); border-radius: 50px 50px 15px 15px;
+            border: 5px solid var(--dark); border-radius: 60px 60px 20px 20px;
             position: relative; z-index: 5;
         }
         .gacha-glass {
-            width: 160px; height: 110px; background: var(--glass);
-            border: 3px solid var(--dark); border-radius: 40px 40px 10px 10px;
-            position: absolute; top: 15px; left: 21px; 
+            width: 170px; height: 120px; background: var(--glass);
+            border: 4px solid var(--dark); border-radius: 50px 50px 10px 10px;
+            position: absolute; top: 18px; left: 21px; 
             display: flex; justify-content: center; align-items: center; gap: 8px;
         }
-
-        /* 確保蛋係正圓形 */
-        .top-capsule { 
-            width: 32px; height: 32px; aspect-ratio: 1/1; 
-            border-radius: 50%; border: 2.5px solid var(--dark); flex-shrink: 0;
-        }
+        .top-capsule { width: 32px; height: 32px; aspect-ratio: 1/1; border-radius: 50%; border: 2.5px solid var(--dark); flex-shrink: 0; }
         .bottom-capsule {
-            width: 40px; height: 40px; aspect-ratio: 1/1;
-            border-radius: 50%; border: 3px solid var(--dark);
-            position: absolute; bottom: 12px; left: 82px; z-index: 10; display: none;
+            width: 42px; height: 42px; aspect-ratio: 1/1; border-radius: 50%; border: 3px solid var(--dark);
+            position: absolute; bottom: 15px; left: 85px; z-index: 10; display: none;
         }
-
         .knob {
-            width: 55px; height: 55px; background: #fff; border: 4.5px solid var(--dark);
-            border-radius: 50%; position: absolute; bottom: 70px; left: 74px;
+            width: 60px; height: 60px; background: #fff; border: 5px solid var(--dark);
+            border-radius: 50%; position: absolute; bottom: 75px; left: 78px;
             cursor: pointer; z-index: 10; transition: transform 0.4s;
         }
-        .knob::after { content: ''; position: absolute; width: 34px; height: 10px; background: var(--dark); top: 18px; left: 6px; border-radius: 5px; }
+        .knob::after { content: ''; position: absolute; width: 38px; height: 10px; background: var(--dark); top: 20px; left: 6px; border-radius: 5px; }
         .spin { transform: rotate(180deg); }
-        .exit { width: 75px; height: 50px; background: var(--dark); position: absolute; bottom: 10px; left: 64px; border-radius: 8px; z-index: 6; }
+        .exit { width: 85px; height: 55px; background: var(--dark); position: absolute; bottom: 12px; left: 66px; border-radius: 8px; z-index: 6; }
 
         /* 錄音按鈕 */
         #recordBtn {
-            background: var(--success); color: white; border: none; padding: 16px 50px;
-            border-radius: 40px; font-size: 1.3rem; cursor: pointer; display: none;
-            box-shadow: 0 6px 0 #1e7066; margin-top: 5px;
+            background: var(--success); color: white; border: none; padding: 18px 55px;
+            border-radius: 40px; font-size: 1.35rem; cursor: pointer; display: none;
+            box-shadow: 0 6px 0 #1e7066;
         }
         #recordBtn.listening { background: var(--primary); box-shadow: 0 6px 0 #b91c1c; animation: pulse 1s infinite; }
+
+        /* Pop-up Window (Modal) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: none; justify-content: center;
+            align-items: center; z-index: 100;
+        }
+        .modal-content {
+            background: white; width: 85%; padding: 30px 20px; border-radius: 20px;
+            text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .modal-content h3 { font-size: 1.5rem; margin: 0 0 15px 0; }
+        .modal-content p { font-size: 1.1rem; margin-bottom: 25px; line-height: 1.4; }
+        .modal-btn {
+            background: var(--dark); color: white; border: none; padding: 12px 40px;
+            border-radius: 30px; font-size: 1.1rem; cursor: pointer;
+        }
+
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
     </style>
 </head>
@@ -99,8 +103,6 @@
     </div>
 
     <div class="game-container">
-        <div id="feedback">Twist the knob to start!<br>撳掣開始練習！</div>
-
         <div class="machine-wrap">
             <div id="outCapsule" class="bottom-capsule"></div>
             <div class="gacha-body">
@@ -114,8 +116,15 @@
                 <div class="exit"></div>
             </div>
         </div>
-
         <button id="recordBtn">🎤 Answer / 錄音回答</button>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <h3 id="modalTitle"></h3>
+            <p id="modalBody"></p>
+            <button class="modal-btn" onclick="closeModal()">Next / 下一題</button>
+        </div>
     </div>
 
 <script>
@@ -126,8 +135,11 @@
         { q: "there is a strange noise", a: "turn off the shredder" }
     ];
 
-    const correctMsgs = ["Excellent! 做得好好！🌟", "Correct! 太棒了！👏", "Perfect! 完全正確！🔥"];
-    const tryAgainMsgs = ["Not quite. 差少少再試試！💪", "Almost there! 繼續努力！🐢", "Try again! 唔好放棄！🌈"];
+    const correctMsgs = [
+        { en: "Excellent!", hk: "做得好好！🌟" },
+        { en: "Correct!", hk: "太棒了！👏" },
+        { en: "Perfect!", hk: "完全正確！🔥" }
+    ];
 
     const studyList = document.getElementById('studyList');
     QA.forEach(item => {
@@ -140,7 +152,7 @@
     const outCapsule = document.getElementById('outCapsule');
     const topCapsules = document.querySelectorAll('.top-capsule');
     const recordBtn = document.getElementById('recordBtn');
-    const feedback = document.getElementById('feedback');
+    const modal = document.getElementById('modalOverlay');
     let currentA = "";
 
     function speak(text) {
@@ -151,11 +163,33 @@
         window.speechSynthesis.speak(utter);
     }
 
+    function showPopUp(isCorrect, userSpeech = "") {
+        const titleEl = document.getElementById('modalTitle');
+        const bodyEl = document.getElementById('modalBody');
+        
+        if (isCorrect) {
+            const msg = correctMsgs[Math.floor(Math.random() * correctMsgs.length)];
+            titleEl.innerHTML = `<span style="color:var(--success)">${msg.en}</span>`;
+            bodyEl.innerHTML = `${msg.hk}<br><br><small>Perfect pronunciation!</small>`;
+            speak("Well done!");
+        } else {
+            titleEl.innerHTML = `<span style="color:var(--primary)">Try Again! 再試吓！</span>`;
+            bodyEl.innerHTML = `You said: "${userSpeech}"<br>Don't give up! 💪`;
+        }
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+        recordBtn.style.display = 'none';
+        outCapsule.style.display = 'none';
+        topCapsules.forEach(c => c.style.opacity = "1");
+    }
+
     knob.onclick = () => {
         recordBtn.style.display = "none";
         outCapsule.style.display = "none";
         topCapsules.forEach(c => c.style.opacity = "1");
-        feedback.innerHTML = "Twisting... 扭緊喇... ⚙️";
         knob.classList.add('spin');
 
         setTimeout(() => {
@@ -168,7 +202,6 @@
             const task = QA[Math.floor(Math.random() * QA.length)];
             currentA = task.a;
             speak(`What should I do if ${task.q}?`);
-            feedback.innerHTML = "Listen! / 請回答對應操作";
             recordBtn.style.display = "block";
         }, 600);
     };
@@ -180,9 +213,8 @@
 
         recordBtn.onclick = () => {
             recognition.start();
-            recordBtn.innerText = "Listening... 正在聽...";
+            recordBtn.innerText = "Listening...";
             recordBtn.classList.add('listening');
-            recordBtn.disabled = true;
         };
 
         recognition.onresult = (event) => {
@@ -190,31 +222,13 @@
             recognition.stop();
             recordBtn.classList.remove('listening');
             recordBtn.innerText = "🎤 Answer / 錄音回答";
-            recordBtn.disabled = false;
             
-            if (userSpeech.includes(currentA.toLowerCase())) {
-                const msg = correctMsgs[Math.floor(Math.random() * correctMsgs.length)];
-                feedback.innerHTML = `<span style="color:var(--success)">${msg}</span>`;
-                speak("Well done!");
-                recordBtn.style.display = "none";
-            } else {
-                const msg = tryAgainMsgs[Math.floor(Math.random() * tryAgainMsgs.length)];
-                feedback.innerHTML = `<span style="color:var(--primary)">${msg}</span><br><small>You said: "${userSpeech}"</small>`;
-            }
+            const isCorrect = userSpeech.includes(currentA.toLowerCase());
+            showPopUp(isCorrect, userSpeech);
         };
 
-        recognition.onspeechend = () => { 
-            recognition.stop(); 
-            recordBtn.classList.remove('listening');
-            recordBtn.disabled = false;
-            recordBtn.innerText = "🎤 Answer / 錄音回答";
-        };
-        recognition.onerror = () => {
-            recognition.stop();
-            recordBtn.classList.remove('listening');
-            recordBtn.disabled = false;
-            recordBtn.innerText = "🎤 Answer / 錄音回答";
-        };
+        recognition.onspeechend = () => { recognition.stop(); recordBtn.classList.remove('listening'); };
+        recognition.onerror = () => { recognition.stop(); recordBtn.classList.remove('listening'); };
     }
 </script>
 </body>
