@@ -3,62 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VE1A Troubleshooting</title>
+    <title>VE1A Troubleshooting - Gacha Shop</title>
     <style>
-        :root { --primary: #e63946; --dark: #1d3557; --glass: rgba(255,255,255,0.7); --bg: #f1faee; --success: #2a9d8f; }
-        body { 
-            font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; 
-            display: flex; flex-direction: column; align-items: center; 
-            height: 100vh; width: 100vw; overflow: hidden;
+        :root { 
+            --primary: #ef233c; --dark: #2b2d42; --glass: rgba(255,255,255,0.6); 
+            --shop-bg: #f8f1e5; --wood: #d4a373; --success: #38b000; 
         }
         
+        body { 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            background: var(--shop-bg); /* 日本店舖淺木色調 */
+            margin: 0; display: flex; flex-direction: column; align-items: center; 
+            height: 100vh; width: 100vw; overflow: hidden;
+            background-image: linear-gradient(0deg, #e9edc9 0%, transparent 40%);
+        }
+
+        /* 日本舖頭橫幅 */
+        .shop-banner {
+            background: #d90429; color: white; width: 100%; padding: 8px 0;
+            text-align: center; font-weight: bold; font-size: 0.9rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-shrink: 0;
+            letter-spacing: 2px;
+        }
+
         .instruction-header { 
-            background: var(--dark); color: #a8dadc; width: 100%; padding: 10px 0; 
+            background: var(--dark); color: #edf2f4; width: 100%; padding: 10px 0; 
             display: flex; justify-content: center; gap: 20px; flex-shrink: 0;
-            font-size: 0.85rem; font-weight: 600;
+            font-size: 0.8rem;
         }
         .instruction-header div { display: flex; flex-direction: column; text-align: center; }
 
         .troubleshoot-list { 
-            width: 94%; background: white; border: 2px solid var(--dark); border-radius: 10px; 
-            margin: 5px 0; padding: 6px 12px; box-sizing: border-box; flex-shrink: 0; 
+            width: 92%; background: white; border: 2px solid var(--dark); border-radius: 8px; 
+            margin: 10px 0; padding: 8px; box-sizing: border-box; flex-shrink: 0;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.05);
         }
-        .troubleshoot-list h2 { font-size: 0.9rem; margin: 0 0 3px 0; text-align: center; border-bottom: 1px solid #eee; }
-        .troubleshoot-list ul { margin: 0; padding-left: 18px; font-size: 0.82rem; list-style-type: disc; line-height: 1.2; }
+        .troubleshoot-list h2 { font-size: 0.85rem; margin: 0 0 4px 0; text-align: center; color: var(--dark); }
+        .troubleshoot-list ul { margin: 0; padding-left: 18px; font-size: 0.8rem; list-style-type: square; line-height: 1.2; }
 
-        .game-container { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; width: 100%; padding-top: 5px; }
-        
-        .machine-wrap { position: relative; width: 190px; height: 230px; margin-bottom: 5px; }
-        .gacha-body { width: 100%; height: 100%; background: var(--primary); border: 4px solid var(--dark); border-radius: 45px 45px 15px 15px; position: relative; z-index: 5; }
-        
-        .gacha-glass {
-            width: 130px; height: 90px; background: var(--glass);
-            border: 3px solid var(--dark); border-radius: 35px 35px 10px 10px;
-            position: absolute; top: 15px; left: 27px; 
-            display: grid; grid-template-columns: 1fr 1fr; justify-items: center; align-items: center;
-            padding: 5px;
+        /* 重新設計的扭蛋機 */
+        .gacha-machine {
+            width: 200px; height: 280px;
+            display: flex; flex-direction: column; align-items: center;
+            position: relative; margin-top: 5px;
         }
-        .top-capsule { width: 28px; height: 28px; aspect-ratio: 1/1; border-radius: 50%; border: 2px solid var(--dark); }
 
-        .bottom-capsule {
-            width: 38px; height: 38px; aspect-ratio: 1/1; border-radius: 50%; border: 3px solid var(--dark);
-            position: absolute; bottom: 10px; left: 73px; z-index: 10; display: none;
+        /* 1. 玻璃罩層 */
+        .machine-top {
+            width: 170px; height: 120px; background: var(--glass);
+            border: 6px solid var(--dark); border-radius: 60px 60px 10px 10px;
+            display: grid; grid-template-columns: 1fr 1fr; 
+            justify-items: center; align-items: center; padding: 10px;
+            position: relative; z-index: 2; background-image: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%);
         }
+
+        /* 2. 機身中層 (旋鈕層) */
+        .machine-body {
+            width: 190px; height: 130px; background: var(--primary);
+            border: 6px solid var(--dark); border-top: none;
+            border-radius: 0 0 20px 20px;
+            display: flex; flex-direction: column; align-items: center;
+            position: relative; margin-top: -5px; z-index: 1;
+        }
+
+        .capsule { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--dark); }
+
+        /* 旋鈕 */
+        .knob-container { margin-top: 15px; position: relative; }
         .knob {
-            width: 48px; height: 48px; background: #fff; border: 4px solid var(--dark);
-            border-radius: 50%; position: absolute; bottom: 62px; left: 68px;
-            cursor: pointer; z-index: 10; transition: transform 0.4s;
+            width: 55px; height: 55px; background: #fff; border: 5px solid var(--dark);
+            border-radius: 50%; cursor: pointer; position: relative;
+            transition: transform 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95);
         }
-        .knob::after { content: ''; position: absolute; width: 30px; height: 8px; background: var(--dark); top: 16px; left: 5px; border-radius: 4px; }
+        .knob::after { content: ''; position: absolute; width: 38px; height: 10px; background: var(--dark); top: 22px; left: 8px; border-radius: 5px; }
         .spin { transform: rotate(180deg); }
-        .exit { width: 65px; height: 40px; background: var(--dark); position: absolute; bottom: 8px; left: 59px; border-radius: 8px; z-index: 6; }
+
+        /* 出蛋口 */
+        .exit-port {
+            width: 70px; height: 45px; background: var(--dark);
+            border-radius: 8px 8px 0 0; position: absolute; bottom: 0;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* 跌出來的蛋 */
+        .out-capsule {
+            width: 42px; height: 42px; border-radius: 50%; border: 3px solid var(--dark);
+            position: absolute; bottom: 5px; z-index: 10; display: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
 
         #recordBtn {
-            background: var(--success); color: white; border: none; padding: 14px 45px;
-            border-radius: 35px; font-size: 1.2rem; cursor: pointer; display: none;
-            box-shadow: 0 5px 0 #1e7066; margin-top: 5px;
+            background: var(--success); color: white; border: none; padding: 16px 50px;
+            border-radius: 40px; font-size: 1.3rem; cursor: pointer; display: none;
+            box-shadow: 0 6px 0 #247a00; margin-top: 20px; font-weight: bold;
         }
-        #recordBtn.listening { background: var(--primary); box-shadow: 0 5px 0 #b91c1c; animation: pulse 1s infinite; }
+        #recordBtn.listening { background: #d00000; box-shadow: 0 6px 0 #900000; animation: pulse 1s infinite; }
 
         /* Pop-up */
         .modal-overlay {
@@ -66,24 +105,19 @@
             background: rgba(0,0,0,0.85); display: none; justify-content: center;
             align-items: center; z-index: 100;
         }
-        .modal-content { background: white; width: 80%; padding: 25px; border-radius: 20px; text-align: center; }
+        .modal-content { background: white; width: 80%; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 0 20px var(--wood); }
         .modal-content.shake-anim { animation: shake 0.5s ease-in-out; }
 
-        /* 新彩帶樣式 */
-        .confetti {
-            position: fixed; width: 6px; height: 12px; z-index: 101;
-            animation: confetti-fall 2.5s ease-out forwards;
-        }
+        .confetti { position: fixed; width: 6px; height: 12px; z-index: 101; animation: confetti-fall 2.5s ease-out forwards; }
 
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-12px); } 40%, 80% { transform: translateX(12px); } }
-        @keyframes confetti-fall {
-            0% { transform: translateY(0) rotateX(0) rotateY(0); opacity: 1; }
-            100% { transform: translateY(100vh) rotateX(720deg) rotateY(360deg); opacity: 0; }
-        }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        @keyframes confetti-fall { 0% { transform: translateY(0) rotate(0); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
+
+    <div class="shop-banner">ガシャポン GACHAPON TOKYO</div>
 
     <div class="instruction-header">
         <div><span>Twist</span><span>扭動旋鈕</span></div>
@@ -92,31 +126,32 @@
     </div>
 
     <div class="troubleshoot-list">
-        <h2>Troubleshooting</h2>
+        <h2>Troubleshooting Check-list</h2>
         <ul id="studyList"></ul>
     </div>
 
-    <div class="game-container">
-        <div class="machine-wrap">
-            <div id="outCapsule" class="bottom-capsule"></div>
-            <div class="gacha-body">
-                <div class="gacha-glass">
-                    <div class="top-capsule" style="background:#ffadad"></div>
-                    <div class="top-capsule" style="background:#ffd6a5"></div>
-                    <div class="top-capsule" style="background:#caffbf"></div>
-                    <div class="top-capsule" style="background:#9bf6ff"></div>
-                </div>
-                <div class="knob" id="knob"></div>
-                <div class="exit"></div>
-            </div>
+    <div class="gacha-machine">
+        <div class="machine-top">
+            <div class="capsule" style="background:#ffadad"></div>
+            <div class="capsule" style="background:#ffd6a5"></div>
+            <div class="capsule" style="background:#caffbf"></div>
+            <div class="capsule" style="background:#9bf6ff"></div>
         </div>
-        <button id="recordBtn">🎤 Answer / 錄音回答</button>
+        <div class="machine-body">
+            <div class="knob-container">
+                <div class="knob" id="knob"></div>
+            </div>
+            <div class="exit-port"></div>
+        </div>
+        <div id="outCapsule" class="out-capsule"></div>
     </div>
+
+    <button id="recordBtn">🎤 Answer / 錄音回答</button>
 
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-content" id="modalContent">
-            <h1 id="modalTitle" style="font-size: 2rem; margin-bottom: 10px;"></h1>
-            <p id="modalBody" style="font-size: 1.1rem; margin-bottom: 20px;"></p>
+            <h1 id="modalTitle" style="font-size: 2rem; margin:0;"></h1>
+            <p id="modalBody" style="font-size: 1.1rem; margin: 15px 0;"></p>
             <div id="modalFooter"></div>
         </div>
     </div>
@@ -138,24 +173,29 @@
 
     const knob = document.getElementById('knob');
     const outCapsule = document.getElementById('outCapsule');
-    const topCapsules = document.querySelectorAll('.top-capsule');
+    const capsules = document.querySelectorAll('.capsule');
     const recordBtn = document.getElementById('recordBtn');
     const modal = document.getElementById('modalOverlay');
     const modalContent = document.getElementById('modalContent');
     let currentA = "";
 
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'en-US';
+        utter.rate = 0.85;
+        window.speechSynthesis.speak(utter);
+    }
+
     function createConfetti() {
-        const colors = ['#f94144', '#f3722c', '#f9c74f', '#90be6d', '#43aa8b', '#577590', '#f9844a'];
+        const colors = ['#f94144', '#f3722c', '#f9c74f', '#90be6d', '#43aa8b', '#577590'];
         for (let i = 0; i < 50; i++) {
             const c = document.createElement('div');
             c.className = 'confetti';
             c.style.left = Math.random() * 100 + 'vw';
-            c.style.top = '-20px';
             c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            c.style.width = (Math.random() * 6 + 4) + 'px';
-            c.style.height = (Math.random() * 10 + 10) + 'px';
-            c.style.animationDelay = (Math.random() * 0.5) + 's';
-            c.style.opacity = Math.random();
+            c.style.width = (Math.random() * 8 + 4) + 'px';
+            c.style.height = (Math.random() * 12 + 6) + 'px';
             document.body.appendChild(c);
             setTimeout(() => c.remove(), 2500);
         }
@@ -169,15 +209,15 @@
 
         if (isCorrect) {
             titleEl.innerHTML = "🌟 Excellent!";
-            bodyEl.innerHTML = "太棒了，完全正確！<br>Excellent work!";
-            footerEl.innerHTML = `<button onclick="closeModal(true)" style="background:var(--dark); color:white; border:none; padding:12px 40px; border-radius:30px; font-size:1.1rem; cursor:pointer;">Next / 下一題</button>`;
+            bodyEl.innerHTML = "太棒了，完全正確！<br>Perfect answer!";
+            footerEl.innerHTML = `<button onclick="closeModal(true)" style="background:var(--dark); color:white; border:none; padding:12px 40px; border-radius:30px; font-size:1.1rem;">Next / 下一題</button>`;
             modalContent.classList.add('shake-anim');
             createConfetti();
             speak("Excellent! Well done.");
         } else {
             titleEl.innerHTML = "❌ Try Again";
             bodyEl.innerHTML = `You said: "${userSpeech}"<br>差少少，再試吓！💪`;
-            footerEl.innerHTML = `<button onclick="closeModal(false)" style="background:var(--primary); color:white; border:none; padding:12px 40px; border-radius:30px; font-size:1.1rem; cursor:pointer;">Try Again / 再試</button>`;
+            footerEl.innerHTML = `<button onclick="closeModal(false)" style="background:var(--primary); color:white; border:none; padding:12px 40px; border-radius:30px; font-size:1.1rem;">Try Again / 再試</button>`;
         }
         modal.style.display = 'flex';
     }
@@ -187,30 +227,20 @@
         if (isNext) {
             recordBtn.style.display = 'none';
             outCapsule.style.display = 'none';
-            topCapsules.forEach(c => c.style.opacity = "1");
+            capsules.forEach(c => c.style.opacity = "1");
         }
-        // 如果唔係 isNext (即係 Try Again)，就維持原狀，等佢再錄音
-    }
-
-    function speak(text) {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = 'en-US';
-        utter.rate = 0.85;
-        window.speechSynthesis.speak(utter);
     }
 
     knob.onclick = () => {
         recordBtn.style.display = "none";
         outCapsule.style.display = "none";
-        topCapsules.forEach(c => c.style.opacity = "1");
         knob.classList.add('spin');
 
         setTimeout(() => {
             knob.classList.remove('spin');
             const r = Math.floor(Math.random() * 4);
-            topCapsules[r].style.opacity = "0";
-            outCapsule.style.background = topCapsules[r].style.background;
+            capsules[r].style.opacity = "0.2";
+            outCapsule.style.background = capsules[r].style.backgroundColor;
             outCapsule.style.display = "block";
 
             const task = QA[Math.floor(Math.random() * QA.length)];
@@ -236,11 +266,9 @@
             recognition.stop();
             recordBtn.classList.remove('listening');
             recordBtn.innerText = "🎤 Answer / 錄音回答";
-            const isCorrect = userSpeech.includes(currentA.toLowerCase());
-            showPopUp(isCorrect, userSpeech);
+            showPopUp(userSpeech.includes(currentA.toLowerCase()), userSpeech);
         };
-        recognition.onspeechend = () => { recognition.stop(); recordBtn.classList.remove('listening'); recordBtn.innerText = "🎤 Answer / 錄音回答"; };
-        recognition.onerror = () => { recognition.stop(); recordBtn.classList.remove('listening'); recordBtn.innerText = "🎤 Answer / 錄音回答"; };
+        recognition.onerror = () => { recognition.stop(); recordBtn.classList.remove('listening'); };
     }
 </script>
 </body>
