@@ -3,96 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Speaking Practice</title>
+    <title>Office Safety Gashapon</title>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: #f4f4f9; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; border: none; background-color: #007bff; color: white; margin: 10px; }
-        button:disabled { background-color: #ccc; }
-        #feedback { margin-top: 20px; font-weight: bold; }
-        .success { color: green; }
-        .error { color: red; }
+        :root { --primary: #ff6b6b; --secondary: #4ecdc4; --gold: #ffd700; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background-color: #f0f2f5; padding: 20px; }
+        
+        /* 扭蛋機樣式 */
+        .machine-container { position: relative; width: 280px; height: 400px; background: var(--primary); margin: 0 auto 20px; border-radius: 40px 40px 20px 20px; border: 8px solid #333; overflow: hidden; }
+        .glass { width: 100%; height: 60%; background: rgba(255,255,255,0.3); border-bottom: 8px solid #333; display: flex; align-items: center; justify-content: center; position: relative; }
+        .capsules-area { font-size: 50px; }
+        
+        /* 扭蛋制 */
+        .knob { width: 80px; height: 80px; background: var(--gold); border: 5px solid #333; border-radius: 50%; margin: 20px auto; cursor: pointer; transition: transform 0.5s; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .knob.spin { transform: rotate(360deg); }
+        
+        /* 錄音制 */
+        .btn-record { padding: 15px 30px; font-size: 18px; border-radius: 50px; border: none; background: var(--secondary); color: white; cursor: pointer; display: none; margin: 0 auto; box-shadow: 0 4px #2a9d8f; }
+        .btn-record:active { transform: translateY(4px); box-shadow: none; }
+
+        /* 句子清單 */
+        .reference-list { max-width: 500px; margin: 30px auto; text-align: left; background: white; padding: 20px; border-radius: 10px; border: 2px dashed #ccc; }
+        
+        #feedback { height: 60px; margin-top: 15px; font-weight: bold; font-size: 1.1em; }
+        .shake { animation: shake 0.5s; }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 10% { transform: translate(-1px, -2px); } 100% { transform: translate(1px, -1px); } }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>Office Safety Q&A</h2>
-    <p>Step 1: Click "Ask Question"</p>
-    <button id="askBtn">Ask Question</button>
-    
-    <div id="questionArea" style="margin: 20px; font-style: italic; color: #555;"></div>
+<h1>🕹️ Office Safety Gashapon</h1>
+<p>Listen carefully and give the right instruction!</p>
 
-    <p>Step 2: Hold "Record Answer" and speak</p>
-    <button id="recordBtn" disabled>🎤 Record Answer</button>
-    
-    <div id="feedback"></div>
-    <p id="score">Completed: 0/4</p>
+<div class="machine-container" id="machine">
+    <div class="glass">
+        <div class="capsules-area" id="capsuleDisplay">🔮🔮🔮</div>
+    </div>
+    <div class="knob" id="spinBtn">TWIST</div>
+    <div style="color: white; font-weight: bold;">INSERT COIN</div>
+</div>
+
+<button id="recordBtn" class="btn-record">🎤 Speak Answer</button>
+<div id="feedback"></div>
+
+<div class="reference-list">
+    <h3>📖 Study List (Look before you play!)</h3>
+    <ul id="studyList"></ul>
 </div>
 
 <script>
     const QA_PAIRS = [
         { q: "the machine overheats", a: "let it cool down" },
         { q: "the machine stops working", a: "check the power supply" },
-        { q: "there is a jammed paper", a: "pull it out gently" },
+        { q: "there is jammed paper", a: "pull it out gently" },
         { q: "there is a strange noise", a: "turn off the shredder" }
     ];
 
-    let remaining = [...QA_PAIRS];
-    let currentQA = null;
-    let completedCount = 0;
+    // 初始化清單
+    const studyList = document.getElementById('studyList');
+    QA_PAIRS.forEach(pair => {
+        const li = document.createElement('li');
+        li.innerHTML = `If <b>${pair.q}</b>, <u>${pair.a}</u>.`;
+        studyList.appendChild(li);
+    });
 
-    const askBtn = document.getElementById('askBtn');
+    let currentQA = null;
+    const spinBtn = document.getElementById('spinBtn');
     const recordBtn = document.getElementById('recordBtn');
     const feedback = document.getElementById('feedback');
-    const questionArea = document.getElementById('questionArea');
+    const machine = document.getElementById('machine');
 
-    // 語音合成 (TTS)
     function speak(text) {
+        window.speechSynthesis.cancel(); // 停止之前的聲音
         const msg = new SpeechSynthesisUtterance(text);
         msg.lang = 'en-US';
+        msg.rate = 0.9; // 稍微慢一點點，方便學生聽
         window.speechSynthesis.speak(msg);
     }
 
-    askBtn.onclick = () => {
-        if (remaining.length === 0) {
-            feedback.innerHTML = "Well done! You've finished all questions.";
-            return;
-        }
-        const index = Math.floor(Math.random() * remaining.length);
-        currentQA = remaining[index];
-        const questionText = `What should I do if ${currentQA.q}?`;
-        questionArea.innerText = questionText;
-        speak(questionText);
-        recordBtn.disabled = false;
-        feedback.innerText = "";
+    // 扭蛋邏輯
+    spinBtn.onclick = () => {
+        spinBtn.classList.add('spin');
+        machine.classList.add('shake');
+        feedback.innerText = "Dispensing question...";
+        recordBtn.style.display = 'none';
+
+        setTimeout(() => {
+            spinBtn.classList.remove('spin');
+            machine.classList.remove('shake');
+            
+            const index = Math.floor(Math.random() * QA_PAIRS.length);
+            currentQA = QA_PAIRS[index];
+            
+            speak(`What should I do if ${currentQA.q}?`);
+            
+            feedback.innerText = "👂 Listening to the machine... (Listen to the question)";
+            recordBtn.style.display = 'block';
+        }, 1000);
     };
 
-    // 語音辨識 (STT)
+    // 語音辨識
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
+    if (!SpeechRecognition) {
+        alert("Your browser does not support speech recognition. Please use Chrome.");
+    } else {
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
 
-    recordBtn.onclick = () => {
-        recognition.start();
-        feedback.innerText = "Listening...";
-    };
+        recordBtn.onclick = () => {
+            recognition.start();
+            feedback.innerText = "🎙️ Recording... Speak now!";
+        };
 
-    recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript.toLowerCase();
-        const targetAnswer = currentQA.a.toLowerCase();
-        
-        // 簡單的比對邏輯
-        if (transcript.includes(targetAnswer) || targetAnswer.includes(transcript)) {
-            feedback.innerHTML = `<span class="success">Correct!</span><br>You said: "${transcript}"`;
-            remaining = remaining.filter(i => i !== currentQA);
-            completedCount++;
-            document.getElementById('score').innerText = `Completed: ${completedCount}/4`;
-            recordBtn.disabled = true;
-        } else {
-            feedback.innerHTML = `<span class="error">Try again.</span><br>You said: "${transcript}"<br>Expected: "${currentQA.a}"`;
-        }
-    };
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g,"");
+            const targetAnswer = currentQA.a.toLowerCase();
+            
+            // 簡單模糊比對
+            if (transcript.includes(targetAnswer) || targetAnswer.includes(transcript)) {
+                feedback.innerHTML = `<span style="color:green">✨ Correct!</span><br>You said: "${transcript}"`;
+                speak("Excellent! That is correct.");
+            } else {
+                feedback.innerHTML = `<span style="color:red">❌ Try again!</span><br>You said: "${transcript}"<br><small>(Hint: ${currentQA.a})</small>`;
+                speak("Not quite, try again.");
+            }
+        };
+    }
 </script>
+
 </body>
 </html>
