@@ -1,4 +1,224 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VE1A Troubleshooting</title>
+    <style>
+        :root { --primary: #e63946; --dark: #1d3557; --glass: rgba(255,255,255,0.7); --bg: #f1faee; --success: #2a9d8f; }
+        body { 
+            font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; 
+            display: flex; flex-direction: column; align-items: center; 
+            height: 100vh; width: 100vw; overflow: hidden;
+        }
+        
+        /* 第一行 Instructions */
+        .instruction-header { 
+            background: var(--dark); color: #a8dadc; width: 100%; padding: 15px 0; 
+            display: flex; justify-content: center; gap: 20px; flex-shrink: 0;
+            font-size: 0.9rem; font-weight: 600; text-align: center;
+        }
+        .instruction-header div { display: flex; flex-direction: column; }
+
+        /* Troubleshooting 清單 */
+        .troubleshoot-list { 
+            width: 94%; background: white; border: 2px solid var(--dark); border-radius: 10px; 
+            margin: 10px 0; padding: 10px; box-sizing: border-box; flex-shrink: 0; 
+        }
+        .troubleshoot-list h2 { font-size: 1rem; margin: 0 0 5px 0; text-align: center; border-bottom: 2px solid #eee; }
+        .troubleshoot-list ul { margin: 0; padding-left: 20px; font-size: 0.9rem; list-style-type: disc; line-height: 1.3; }
+
+        /* 遊戲區域 */
+        .game-container { 
+            flex-grow: 1; display: flex; flex-direction: column; 
+            justify-content: flex-start; align-items: center; width: 100%;
+        }
+
+        /* 搬上嚟嘅 Feedback Prompt */
+        #feedback { 
+            font-size: 1.1rem; font-weight: bold; color: var(--dark); 
+            margin: 5px 0; min-height: 2.8em; text-align: center; width: 90%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        
+        /* 扭蛋機 */
+        .machine-wrap { position: relative; width: 210px; height: 260px; margin-bottom: 10px; }
+        .gacha-body { 
+            width: 100%; height: 100%; background: var(--primary); 
+            border: 4px solid var(--dark); border-radius: 50px 50px 15px 15px;
+            position: relative; z-index: 5;
+        }
+        .gacha-glass {
+            width: 160px; height: 110px; background: var(--glass);
+            border: 3px solid var(--dark); border-radius: 40px 40px 10px 10px;
+            position: absolute; top: 15px; left: 21px; 
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+
+        /* 確保蛋係正圓形 */
+        .top-capsule { 
+            width: 32px; height: 32px; aspect-ratio: 1/1; 
+            border-radius: 50%; border: 2.5px solid var(--dark); flex-shrink: 0;
+        }
+        .bottom-capsule {
+            width: 40px; height: 40px; aspect-ratio: 1/1;
+            border-radius: 50%; border: 3px solid var(--dark);
+            position: absolute; bottom: 12px; left: 82px; z-index: 10; display: none;
+        }
+
+        .knob {
+            width: 55px; height: 55px; background: #fff; border: 4.5px solid var(--dark);
+            border-radius: 50%; position: absolute; bottom: 70px; left: 74px;
+            cursor: pointer; z-index: 10; transition: transform 0.4s;
+        }
+        .knob::after { content: ''; position: absolute; width: 34px; height: 10px; background: var(--dark); top: 18px; left: 6px; border-radius: 5px; }
+        .spin { transform: rotate(180deg); }
+        .exit { width: 75px; height: 50px; background: var(--dark); position: absolute; bottom: 10px; left: 64px; border-radius: 8px; z-index: 6; }
+
+        /* 錄音按鈕 */
+        #recordBtn {
+            background: var(--success); color: white; border: none; padding: 16px 50px;
+            border-radius: 40px; font-size: 1.3rem; cursor: pointer; display: none;
+            box-shadow: 0 6px 0 #1e7066; margin-top: 5px;
+        }
+        #recordBtn.listening { background: var(--primary); box-shadow: 0 6px 0 #b91c1c; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="instruction-header">
+        <div><span>Twist</span><span>扭動旋鈕</span></div>
+        <div><span>Listen</span><span>聽取問題</span></div>
+        <div><span>Speak</span><span>錄音回答</span></div>
+    </div>
+
+    <div class="troubleshoot-list">
+        <h2>Troubleshooting</h2>
+        <ul id="studyList"></ul>
+    </div>
+
+    <div class="game-container">
+        <div id="feedback">Twist the knob to start!<br>撳掣開始練習！</div>
+
+        <div class="machine-wrap">
+            <div id="outCapsule" class="bottom-capsule"></div>
+            <div class="gacha-body">
+                <div class="gacha-glass">
+                    <div class="top-capsule" style="background:#ffadad"></div>
+                    <div class="top-capsule" style="background:#ffd6a5"></div>
+                    <div class="top-capsule" style="background:#caffbf"></div>
+                    <div class="top-capsule" style="background:#9bf6ff"></div>
+                </div>
+                <div class="knob" id="knob"></div>
+                <div class="exit"></div>
+            </div>
+        </div>
+
+        <button id="recordBtn">🎤 Answer / 錄音回答</button>
+    </div>
+
+<script>
+    const QA = [
+        { q: "the machine overheats", a: "let it cool down" },
+        { q: "the machine stops working", a: "check the power supply" },
+        { q: "there is a jammed paper", a: "pull it out gently" },
+        { q: "there is a strange noise", a: "turn off the shredder" }
+    ];
+
+    const correctMsgs = ["Excellent! 做得好好！🌟", "Correct! 太棒了！👏", "Perfect! 完全正確！🔥"];
+    const tryAgainMsgs = ["Not quite. 差少少再試試！💪", "Almost there! 繼續努力！🐢", "Try again! 唔好放棄！🌈"];
+
+    const studyList = document.getElementById('studyList');
+    QA.forEach(item => {
+        const li = document.createElement('li');
+        li.innerText = `If ${item.q}, ${item.a}`;
+        studyList.appendChild(li);
+    });
+
+    const knob = document.getElementById('knob');
+    const outCapsule = document.getElementById('outCapsule');
+    const topCapsules = document.querySelectorAll('.top-capsule');
+    const recordBtn = document.getElementById('recordBtn');
+    const feedback = document.getElementById('feedback');
+    let currentA = "";
+
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'en-US';
+        utter.rate = 0.85;
+        window.speechSynthesis.speak(utter);
+    }
+
+    knob.onclick = () => {
+        recordBtn.style.display = "none";
+        outCapsule.style.display = "none";
+        topCapsules.forEach(c => c.style.opacity = "1");
+        feedback.innerHTML = "Twisting... 扭緊喇... ⚙️";
+        knob.classList.add('spin');
+
+        setTimeout(() => {
+            knob.classList.remove('spin');
+            const r = Math.floor(Math.random() * 4);
+            topCapsules[r].style.opacity = "0";
+            outCapsule.style.background = topCapsules[r].style.background;
+            outCapsule.style.display = "block";
+
+            const task = QA[Math.floor(Math.random() * QA.length)];
+            currentA = task.a;
+            speak(`What should I do if ${task.q}?`);
+            feedback.innerHTML = "Listen! / 請回答對應操作";
+            recordBtn.style.display = "block";
+        }, 600);
+    };
+
+    const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+    if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+
+        recordBtn.onclick = () => {
+            recognition.start();
+            recordBtn.innerText = "Listening... 正在聽...";
+            recordBtn.classList.add('listening');
+            recordBtn.disabled = true;
+        };
+
+        recognition.onresult = (event) => {
+            const userSpeech = event.results[0][0].transcript.toLowerCase();
+            recognition.stop();
+            recordBtn.classList.remove('listening');
+            recordBtn.innerText = "🎤 Answer / 錄音回答";
+            recordBtn.disabled = false;
+            
+            if (userSpeech.includes(currentA.toLowerCase())) {
+                const msg = correctMsgs[Math.floor(Math.random() * correctMsgs.length)];
+                feedback.innerHTML = `<span style="color:var(--success)">${msg}</span>`;
+                speak("Well done!");
+                recordBtn.style.display = "none";
+            } else {
+                const msg = tryAgainMsgs[Math.floor(Math.random() * tryAgainMsgs.length)];
+                feedback.innerHTML = `<span style="color:var(--primary)">${msg}</span><br><small>You said: "${userSpeech}"</small>`;
+            }
+        };
+
+        recognition.onspeechend = () => { 
+            recognition.stop(); 
+            recordBtn.classList.remove('listening');
+            recordBtn.disabled = false;
+            recordBtn.innerText = "🎤 Answer / 錄音回答";
+        };
+        recognition.onerror = () => {
+            recognition.stop();
+            recordBtn.classList.remove('listening');
+            recordBtn.disabled = false;
+            recordBtn.innerText = "🎤 Answer / 錄音回答";
+        };
+    }
+</script>
+</body>
+</html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
