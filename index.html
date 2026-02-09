@@ -2,133 +2,181 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Office Safety Gashapon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Safety Gashapon</title>
     <style>
-        :root { --primary: #ff6b6b; --secondary: #4ecdc4; --gold: #ffd700; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background-color: #f0f2f5; padding: 20px; }
+        :root { --red: #e63946; --blue: #457b9d; --yellow: #f1faee; --dark: #1d3557; }
+        body { font-family: -apple-system, sans-serif; background: #a8dadc; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; }
         
-        /* 扭蛋機樣式 */
-        .machine-container { position: relative; width: 280px; height: 400px; background: var(--primary); margin: 0 auto 20px; border-radius: 40px 40px 20px 20px; border: 8px solid #333; overflow: hidden; }
-        .glass { width: 100%; height: 60%; background: rgba(255,255,255,0.3); border-bottom: 8px solid #333; display: flex; align-items: center; justify-content: center; position: relative; }
-        .capsules-area { font-size: 50px; }
-        
-        /* 扭蛋制 */
-        .knob { width: 80px; height: 80px; background: var(--gold); border: 5px solid #333; border-radius: 50%; margin: 20px auto; cursor: pointer; transition: transform 0.5s; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .knob.spin { transform: rotate(360deg); }
-        
-        /* 錄音制 */
-        .btn-record { padding: 15px 30px; font-size: 18px; border-radius: 50px; border: none; background: var(--secondary); color: white; cursor: pointer; display: none; margin: 0 auto; box-shadow: 0 4px #2a9d8f; }
-        .btn-record:active { transform: translateY(4px); box-shadow: none; }
+        h2 { font-size: 1.2rem; margin: 5px; color: var(--dark); }
 
-        /* 句子清單 */
-        .reference-list { max-width: 500px; margin: 30px auto; text-align: left; background: white; padding: 20px; border-radius: 10px; border: 2px dashed #ccc; }
+        /* 扭蛋機樣式 */
+        .gacha-machine {
+            width: 180px; height: 260px; background: var(--red); 
+            border: 4px solid var(--dark); border-radius: 50px 50px 15px 15px;
+            position: relative; margin: 10px auto; box-shadow: 0 10px 0 #b91c1c;
+        }
+        .gacha-glass {
+            width: 140px; height: 110px; background: rgba(255,255,255,0.6);
+            border-radius: 40px 40px 10px 10px; border: 4px solid var(--dark);
+            position: absolute; top: 15px; left: 16px; overflow: hidden;
+            display: flex; flex-wrap: wrap; justify-content: center; align-content: center;
+        }
+        .capsule { width: 25px; height: 25px; border-radius: 50%; border: 2px solid #333; margin: 2px; }
         
-        #feedback { height: 60px; margin-top: 15px; font-weight: bold; font-size: 1.1em; }
-        .shake { animation: shake 0.5s; }
-        @keyframes shake { 0% { transform: translate(1px, 1px); } 10% { transform: translate(-1px, -2px); } 100% { transform: translate(1px, -1px); } }
+        /* 扭蛋掣 */
+        .gacha-knob {
+            width: 50px; height: 50px; background: #eee; border: 4px solid var(--dark);
+            border-radius: 50%; position: absolute; bottom: 65px; left: 61px;
+            cursor: pointer; transition: transform 0.3s;
+        }
+        .gacha-knob::after { content: ''; position: absolute; width: 80%; height: 10px; background: var(--dark); top: 16px; left: 10%; }
+        .spin { transform: rotate(180deg); }
+
+        /* 出蛋口 */
+        .gacha-exit {
+            width: 60px; height: 40px; background: var(--dark);
+            position: absolute; bottom: 10px; left: 56px; border-radius: 10px 10px 5px 5px;
+        }
+
+        /* 按鈕及資訊 */
+        #recordBtn {
+            padding: 12px 25px; font-size: 1rem; border-radius: 25px; border: none;
+            background: var(--dark); color: white; cursor: pointer;
+            visibility: hidden; margin: 10px 0;
+        }
+        #feedback { font-size: 0.9rem; height: 45px; text-align: center; padding: 0 10px; font-weight: bold; }
+
+        /* 底部清單 */
+        .footer-list {
+            background: white; border-radius: 10px; padding: 10px; 
+            width: 90%; font-size: 0.75rem; border: 1px solid #ccc;
+        }
+        .footer-list ul { margin: 5px 0; padding-left: 20px; }
+        
+        .shake { animation: shake 0.4s; }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
     </style>
 </head>
 <body>
 
-<h1>🕹️ Office Safety Gashapon</h1>
-<p>Listen carefully and give the right instruction!</p>
+    <h2>🛠️ Office Safety Practice</h2>
 
-<div class="machine-container" id="machine">
-    <div class="glass">
-        <div class="capsules-area" id="capsuleDisplay">🔮🔮🔮</div>
+    <div class="gacha-machine" id="machine">
+        <div class="gacha-glass" id="glass">
+            <div class="capsule" style="background:#ffadad"></div>
+            <div class="capsule" style="background:#ffd6a5"></div>
+            <div class="capsule" style="background:#fdffb6"></div>
+            <div class="capsule" style="background:#caffbf"></div>
+            <div class="capsule" style="background:#9bf6ff"></div>
+        </div>
+        <div class="gacha-knob" id="knob"></div>
+        <div class="gacha-exit"></div>
     </div>
-    <div class="knob" id="spinBtn">TWIST</div>
-    <div style="color: white; font-weight: bold;">INSERT COIN</div>
-</div>
 
-<button id="recordBtn" class="btn-record">🎤 Speak Answer</button>
-<div id="feedback"></div>
+    <div id="feedback">Click the knob to twist a question!</div>
 
-<div class="reference-list">
-    <h3>📖 Study List (Look before you play!)</h3>
-    <ul id="studyList"></ul>
-</div>
+    <button id="recordBtn">🎤 Answer Now</button>
+
+    <div class="footer-list">
+        <strong>Reference Sentences:</strong>
+        <ul id="sentences"></ul>
+    </div>
 
 <script>
-    const QA_PAIRS = [
+    const QA = [
         { q: "the machine overheats", a: "let it cool down" },
         { q: "the machine stops working", a: "check the power supply" },
         { q: "there is jammed paper", a: "pull it out gently" },
         { q: "there is a strange noise", a: "turn off the shredder" }
     ];
 
-    // 初始化清單
-    const studyList = document.getElementById('studyList');
-    QA_PAIRS.forEach(pair => {
-        const li = document.createElement('li');
-        li.innerHTML = `If <b>${pair.q}</b>, <u>${pair.a}</u>.`;
-        studyList.appendChild(li);
-    });
-
-    let currentQA = null;
-    const spinBtn = document.getElementById('spinBtn');
+    const knob = document.getElementById('knob');
+    const machine = document.getElementById('machine');
     const recordBtn = document.getElementById('recordBtn');
     const feedback = document.getElementById('feedback');
-    const machine = document.getElementById('machine');
+    const sentenceList = document.getElementById('sentences');
 
+    // 初始化清單
+    QA.forEach(item => {
+        const li = document.createElement('li');
+        li.innerText = `If ${item.q}, ${item.a}.`;
+        sentenceList.appendChild(li);
+    });
+
+    let currentA = "";
+
+    // 語音合成功能
     function speak(text) {
-        window.speechSynthesis.cancel(); // 停止之前的聲音
-        const msg = new SpeechSynthesisUtterance(text);
-        msg.lang = 'en-US';
-        msg.rate = 0.9; // 稍微慢一點點，方便學生聽
-        window.speechSynthesis.speak(msg);
+        const synth = window.speechSynthesis;
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'en-US';
+        utter.rate = 0.85;
+        synth.speak(utter);
     }
 
-    // 扭蛋邏輯
-    spinBtn.onclick = () => {
-        spinBtn.classList.add('spin');
+    // 扭蛋動作
+    knob.onclick = () => {
+        // 重設狀態
+        feedback.innerText = "Twisting...";
+        feedback.style.color = "black";
+        recordBtn.style.visibility = "hidden";
+        knob.classList.add('spin');
         machine.classList.add('shake');
-        feedback.innerText = "Dispensing question...";
-        recordBtn.style.display = 'none';
 
         setTimeout(() => {
-            spinBtn.classList.remove('spin');
+            knob.classList.remove('spin');
             machine.classList.remove('shake');
             
-            const index = Math.floor(Math.random() * QA_PAIRS.length);
-            currentQA = QA_PAIRS[index];
+            const randomTask = QA[Math.floor(Math.random() * QA.length)];
+            currentA = randomTask.a;
             
-            speak(`What should I do if ${currentQA.q}?`);
+            // 播放聲音
+            speak(`What should I do if ${randomTask.q}?`);
             
-            feedback.innerText = "👂 Listening to the machine... (Listen to the question)";
-            recordBtn.style.display = 'block';
-        }, 1000);
+            feedback.innerText = "Listening... (Please answer)";
+            recordBtn.style.visibility = "visible";
+            recordBtn.disabled = false;
+            recordBtn.style.opacity = "1";
+        }, 600);
     };
 
     // 語音辨識
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-        alert("Your browser does not support speech recognition. Please use Chrome.");
-    } else {
+    if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
         recognition.lang = 'en-US';
 
         recordBtn.onclick = () => {
             recognition.start();
-            feedback.innerText = "🎙️ Recording... Speak now!";
+            recordBtn.innerText = "👂 Listening...";
+            recordBtn.disabled = true; // 防止重複撳
         };
 
         recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g,"");
-            const targetAnswer = currentQA.a.toLowerCase();
+            const userSpeech = event.results[0][0].transcript.toLowerCase();
+            recordBtn.innerText = "🎤 Answer Now";
             
-            // 簡單模糊比對
-            if (transcript.includes(targetAnswer) || targetAnswer.includes(transcript)) {
-                feedback.innerHTML = `<span style="color:green">✨ Correct!</span><br>You said: "${transcript}"`;
-                speak("Excellent! That is correct.");
+            // 檢查是否包含關鍵字 (容錯處理)
+            if (userSpeech.includes(currentA.toLowerCase())) {
+                feedback.innerHTML = `<span style="color:green">✔ Correct!</span><br>"${userSpeech}"`;
+                speak("Well done!");
+                // 成功後隱藏錄音制，要求重新扭蛋
+                recordBtn.style.visibility = "hidden";
             } else {
-                feedback.innerHTML = `<span style="color:red">❌ Try again!</span><br>You said: "${transcript}"<br><small>(Hint: ${currentQA.a})</small>`;
-                speak("Not quite, try again.");
+                feedback.innerHTML = `<span style="color:red">✘ Try again!</span><br>You said: "${userSpeech}"`;
+                recordBtn.disabled = false; // 失敗可以再試
             }
         };
+
+        recognition.onerror = () => {
+            feedback.innerText = "Error picking up voice. Try again.";
+            recordBtn.disabled = false;
+            recordBtn.innerText = "🎤 Answer Now";
+        };
+    } else {
+        feedback.innerText = "Speech recognition not supported on this browser.";
     }
 </script>
-
 </body>
 </html>
