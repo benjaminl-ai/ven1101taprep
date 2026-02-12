@@ -3,147 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Troubleshooting Gacha</title>
+    <title>VEN1101 Prep Task Helper (Fashion)</title>
     <style>
         :root { 
+            --yt-red: #ff0000; --yt-black: #0f0f0f; --yt-grey: #606060; --yt-white: #ffffff;
             --primary: #ef233c; --dark: #2b2d42; --glass: rgba(255,255,255,0.6); 
-            --shop-bg: #f8f1e5; --wood: #d4a373; --success: #38b000; 
+            --shop-bg: #f8f1e5; --success: #38b000; 
         }
+        body { font-family: "Roboto", Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
         
-        body { 
-            font-family: 'Helvetica Neue', Arial, sans-serif; 
-            background: var(--shop-bg); margin: 0; display: flex; 
-            flex-direction: column; align-items: center; 
-            height: 100vh; width: 100vw; overflow: hidden;
-            background-image: linear-gradient(0deg, #e9edc9 0%, transparent 40%);
-        }
+        header { background: var(--yt-white); padding: 12px; border-bottom: 1px solid #e5e5e5; text-align: center; position: sticky; top: 0; z-index: 1000; }
+        .logo { color: var(--yt-red); font-weight: bold; font-size: 1.2rem; }
+        
+        .nav-tabs { display: flex; background: white; border-bottom: 1px solid #ddd; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-weight: bold; cursor: pointer; color: var(--yt-grey); border-bottom: 3px solid transparent; }
+        .tab-btn.active { color: var(--yt-red); border-bottom-color: var(--yt-red); }
 
-        .shop-banner {
-            background: #d90429; color: white; width: 100%; padding: 8px 0;
-            text-align: center; font-weight: bold; font-size: 0.9rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-shrink: 0;
-            letter-spacing: 2px;
-        }
+        .container { padding: 15px; max-width: 500px; margin: 0 auto; display: none; }
+        .container.active { display: block; }
 
+        /* Wiring a Plug Styles (Reused for Fashion) */
+        .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #eee; }
+        .fa-img { width: 100%; height: 200px; background-size: contain; background-repeat: no-repeat; background-position: center; background-color: #fff; border-radius: 8px; margin-bottom: 12px; border: 1px solid #eee; }
+        textarea { width: 100%; height: 38px; border: 1px solid #ccc; border-radius: 8px; padding: 8px; box-sizing: border-box; font-size: 0.95rem; margin-bottom: 10px; outline: none; resize: none; overflow: hidden; }
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .btn { padding: 10px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.85rem; }
+        .btn-listen { background: #f2f2f2; color: #333; }
+        .btn-record { background: var(--yt-black); color: white; transition: background 0.3s; }
+        .recording { background: var(--yt-red) !important; animation: pulse 1s infinite; }
+
+        /* Troubleshooting Styles */
+        #troubleshooting { background: var(--shop-bg); min-height: 95vh; text-align: center; }
+        .shop-banner { background: #d90429; color: white; padding: 8px; font-weight: bold; letter-spacing: 2px; font-size: 0.9rem; }
+        
         .instruction-header { 
             background: var(--dark); color: #edf2f4; width: 100%; padding: 10px 0; 
-            display: flex; justify-content: center; gap: 20px; flex-shrink: 0; font-size: 0.8rem;
+            display: flex; justify-content: center; gap: 20px; font-size: 0.8rem;
         }
         .instruction-header div { display: flex; flex-direction: column; text-align: center; }
 
-        .troubleshoot-list { 
-            width: 92%; background: white; border: 2px solid var(--dark); border-radius: 8px; 
-            margin: 10px 0; padding: 10px; box-sizing: border-box; flex-shrink: 0;
-            box-shadow: 4px 4px 0 rgba(0,0,0,0.05);
+        .gacha-machine { width: 200px; height: 260px; display: flex; flex-direction: column; align-items: center; position: relative; margin: 15px auto; }
+        .machine-top { 
+            width: 190px; height: 125px; background: var(--glass); border: 6px solid var(--dark); 
+            border-radius: 60px 60px 10px 10px; display: grid; grid-template-columns: repeat(4, 1fr); 
+            grid-template-rows: repeat(3, 1fr); padding: 15px 10px 5px 10px; gap: 5px; box-sizing: border-box; justify-items: center;
         }
-        .troubleshoot-list h2 { font-size: 1rem; margin: 0 0 5px 0; text-align: center; color: var(--dark); }
-        .troubleshoot-list ul { margin: 0; padding-left: 20px; font-size: 0.88rem; list-style-type: square; line-height: 1.3; }
+        .machine-body { width: 190px; height: 115px; background: var(--primary); border: 6px solid var(--dark); border-top: none; border-radius: 0 0 20px 20px; position: relative; z-index: 1; }
+        .knob { width: 50px; height: 50px; background: #fff; border: 5px solid var(--dark); border-radius: 50%; margin: 10px auto; position: relative; cursor: pointer; transition: transform 0.4s; }
+        .knob::after { content: ''; position: absolute; width: 30px; height: 8px; background: var(--dark); top: 16px; left: 5px; border-radius: 4px; }
+        .knob.spin { transform: rotate(180deg); }
+        .exit-port { width: 65px; height: 38px; background: var(--dark); border-radius: 8px 8px 0 0; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); }
+        
+        .capsule { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--dark); }
+        .out-capsule { width: 38px; height: 38px; border-radius: 50%; border: 3px solid var(--dark); position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); display: none; z-index: 10; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        
+        #recordBtnGacha { background: var(--success); color: white; border: none; padding: 14px 30px; border-radius: 35px; font-size: 1rem; cursor: pointer; display: none; margin: 10px auto; font-weight: bold; box-shadow: 0 4px 0 #247a00; }
 
-        .gacha-machine {
-            width: 200px; height: 260px;
-            display: flex; flex-direction: column; align-items: center;
-            position: relative; margin-top: 5px;
+        #modalOverlay { 
+            display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
+            background: rgba(0,0,0,0.85); z-index: 2000; 
+            align-items: center; justify-content: center;
         }
-
-        .machine-top {
-            width: 170px; height: 115px; background: var(--glass);
-            border: 6px solid var(--dark); border-radius: 60px 60px 10px 10px;
-            display: grid; grid-template-columns: repeat(4, 1fr); 
-            grid-template-rows: repeat(3, 1fr); justify-items: center; 
-            align-items: center; padding: 12px 10px 5px 10px;
-            position: relative; z-index: 2; 
-            background-image: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%); gap: 2px;
-        }
-
-        .machine-body {
-            width: 190px; height: 115px; background: var(--primary);
-            border: 6px solid var(--dark); border-top: none;
-            border-radius: 0 0 20px 20px;
-            display: flex; flex-direction: column; align-items: center;
-            position: relative; margin-top: -5px; z-index: 1;
+        .modal { 
+            background: white; padding: 25px; border-radius: 20px; text-align: center; 
+            width: 85%; max-width: 320px; box-sizing: border-box;
         }
 
-        .capsule { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--dark); transition: opacity 0.3s; }
-
-        .knob-container { margin-top: 8px; position: relative; }
-        .knob {
-            width: 50px; height: 50px; background: #fff; border: 5px solid var(--dark);
-            border-radius: 50%; cursor: pointer; position: relative;
-            transition: transform 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95);
-        }
-        .knob::after { content: ''; position: absolute; width: 32px; height: 10px; background: var(--dark); top: 20px; left: 9px; border-radius: 5px; }
-        .spin { transform: rotate(180deg); }
-
-        .exit-port { width: 65px; height: 38px; background: var(--dark); border-radius: 8px 8px 0 0; position: absolute; bottom: 0; }
-        .out-capsule {
-            width: 38px; height: 38px; border-radius: 50%; border: 3px solid var(--dark);
-            position: absolute; bottom: 5px; z-index: 10; display: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        #recordBtn {
-            background: var(--success); color: white; border: none; padding: 14px 40px;
-            border-radius: 35px; font-size: 1.15rem; cursor: pointer; display: none;
-            box-shadow: 0 5px 0 #247a00; margin-top: 15px; font-weight: bold;
-        }
-        #recordBtn.listening { background: #d00000; box-shadow: 0 5px 0 #900000; animation: pulse 1s infinite; }
-
-        /* Pop-up */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); display: none; justify-content: center;
-            align-items: center; z-index: 100;
-        }
-        .modal-content { background: white; width: 80%; padding: 25px; border-radius: 20px; text-align: center; z-index: 102; position: relative;}
-        .modal-content.shake-anim { animation: shake 0.5s ease-in-out; }
-
-        /* 噴射彩帶樣式 */
-        .confetti {
-            position: fixed; width: 8px; height: 8px;
-            z-index: 101; pointer-events: none;
-        }
-
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div class="shop-banner">ガシャポン GACHAPON TOKYO</div>
+<header>
+    <div class="logo">VEN1101 Prep Task Helper (Fashion)</div>
+</header>
 
+<div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab(0)">Using a Shredder PRO1</button>
+    <button class="tab-btn" onclick="switchTab(1)">Troubleshooting</button>
+</div>
+
+<div id="wiring" class="container active">
+    <div class="card">
+        <div class="fa-img" style="background-image: url('fa1.jpg');"></div>
+        <textarea id="f1" placeholder="Write the step here"></textarea>
+        <div class="btn-row">
+            <button class="btn btn-listen" onclick="speak('f1')">🔊 Listen</button>
+            <button class="btn btn-record" id="rf1" onclick="handleRecord('f1', 'rf1')">🎤 Record</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="fa-img" style="background-image: url('fa2.jpg');"></div>
+        <textarea id="f2" placeholder="Write the step here"></textarea>
+        <div class="btn-row">
+            <button class="btn btn-listen" onclick="speak('f2')">🔊 Listen</button>
+            <button class="btn btn-record" id="rf2" onclick="handleRecord('f2', 'rf2')">🎤 Record</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="fa-img" style="background-image: url('fa3.jpg');"></div>
+        <textarea id="f3" placeholder="Write the step here"></textarea>
+        <div class="btn-row">
+            <button class="btn btn-listen" onclick="speak('f3')">🔊 Listen</button>
+            <button class="btn btn-record" id="rf3" onclick="handleRecord('f3', 'rf3')">🎤 Record</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="fa-img" style="background-image: url('fa4.jpg');"></div>
+        <textarea id="f4" placeholder="Write the step here"></textarea>
+        <div class="btn-row">
+            <button class="btn btn-listen" onclick="speak('f4')">🔊 Listen</button>
+            <button class="btn btn-record" id="rf4" onclick="handleRecord('f4', 'rf4')">🎤 Record</button>
+        </div>
+    </div>
+</div>
+
+<div id="troubleshooting" class="container">
+    <div class="shop-banner">ガシャポン GACHAPON TOKYO</div>
+    
     <div class="instruction-header">
         <div><span>1. Twist</span><span>扭動旋鈕</span></div>
         <div><span>2. Listen</span><span>聽取問題</span></div>
         <div><span>3. Speak</span><span>錄音回答</span></div>
     </div>
 
-    <div class="troubleshoot-list">
-        <h2>Troubleshooting</h2>
-        <ul id="studyList"></ul>
+    <div style="background:white; margin: 10px auto; width: 95%; padding: 12px; border-radius: 8px; text-align: left; font-size: 0.85rem; border: 2px solid var(--dark);">
+        <h3 style="margin: 0 0 5px 0; text-align: center;">Troubleshooting</h3>
+        <ul id="studyList" style="padding-left: 20px; margin: 5px 0; line-height: 1.4;"></ul>
     </div>
 
     <div class="gacha-machine">
         <div class="machine-top" id="capsuleContainer"></div>
         <div class="machine-body">
-            <div class="knob-container">
-                <div class="knob" id="knob"></div>
-            </div>
+            <div class="knob" id="knob"></div>
             <div class="exit-port"></div>
         </div>
         <div id="outCapsule" class="out-capsule"></div>
     </div>
 
-    <button id="recordBtn">🎤 Answer / 錄音回答</button>
+    <button id="recordBtnGacha" onclick="handleGachaRecord()">🎤 Answer / 錄音回答</button>
+</div>
 
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-content" id="modalContent">
-            <h1 id="modalTitle" style="font-size: 2rem; margin:0;"></h1>
-            <p id="modalBody" style="font-size: 1.1rem; margin: 15px 0;"></p>
-            <div id="modalFooter"></div>
-        </div>
+<div id="modalOverlay">
+    <div class="modal">
+        <h2 id="mT">Perfect!</h2>
+        <p id="mM"></p>
+        <button onclick="document.getElementById('modalOverlay').style.display='none'" style="padding:10px 40px; border-radius:20px; border:none; background:var(--dark); color:white; font-weight:bold; cursor:pointer;">Close</button>
     </div>
+</div>
 
 <script>
+    let currentRec = null;
+    let activeId = "";
+
+    function switchTab(idx) {
+        document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.container')[idx].classList.add('active');
+        document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+        if (currentRec) stopRec();
+    }
+
+    function speak(textOrId) {
+        window.speechSynthesis.cancel();
+        const input = document.getElementById(textOrId);
+        const text = input ? input.value : textOrId;
+        if(!text) return;
+        const m = new SpeechSynthesisUtterance(text);
+        m.lang = 'en-US'; m.rate = 0.85;
+        window.speechSynthesis.speak(m);
+    }
+
+    // Task Record Logic
+    function handleRecord(id, btnId) {
+        const btn = document.getElementById(btnId);
+        if (btn.classList.contains('recording')) { stopRec(); return; }
+        if (currentRec) stopRec();
+        activeId = id;
+        startRec(btnId);
+    }
+
+    function startRec(btnId) {
+        const btn = document.getElementById(btnId);
+        const Rec = window.webkitSpeechRecognition || window.SpeechRecognition;
+        if (!Rec) return alert("Browser not supported.");
+        currentRec = new Rec();
+        currentRec.lang = 'en-US';
+        currentRec.continuous = true;
+        btn.classList.add('recording');
+        btn.innerHTML = "🛑 Finish / 完成";
+        currentRec.onresult = (e) => { validate(e.results[e.results.length-1][0].transcript); };
+        currentRec.onend = () => stopRec();
+        currentRec.start();
+    }
+
+    // Troubleshooting Record Logic
+    function handleGachaRecord() {
+        const btn = document.getElementById('recordBtnGacha');
+        if (btn.classList.contains('recording')) {
+            stopRec();
+            return;
+        }
+        
+        const Rec = window.webkitSpeechRecognition || window.SpeechRecognition;
+        if (!Rec) return alert("Not supported");
+        
+        currentRec = new Rec();
+        currentRec.lang = 'en-US';
+        currentRec.continuous = true;
+        btn.innerText = "🛑 Finish / 完成";
+        btn.classList.add('recording');
+        
+        currentRec.onresult = (e) => {
+            const heard = e.results[e.results.length-1][0].transcript.toLowerCase();
+            const isCorrect = heard.includes(currentA.toLowerCase());
+            document.getElementById('mT').innerText = isCorrect ? "🌟 Success!" : "❌ Incorrect";
+            document.getElementById('mM').innerHTML = isCorrect ? "Excellent answer!" : `I heard: "${heard}"<br>Expected keyword: ${currentA}`;
+            document.getElementById('modalOverlay').style.display = 'flex';
+            stopRec();
+        };
+        currentRec.onend = () => stopRec();
+        currentRec.start();
+    }
+
+    function stopRec() {
+        if (currentRec) { currentRec.stop(); currentRec = null; }
+        document.querySelectorAll('.btn-record, #recordBtnGacha').forEach(b => {
+            b.classList.remove('recording');
+            if(b.id === 'recordBtnGacha') b.innerText = "🎤 Answer / 錄音回答";
+            else b.innerHTML = "🎤 Record";
+        });
+    }
+
+    function validate(heard) {
+        const target = document.getElementById(activeId).value.toLowerCase().replace(/[^\w\s]/gi, '');
+        const words = target.split(" ").filter(w => w.length > 3);
+        let matches = 0;
+        words.forEach(w => { if(heard.toLowerCase().includes(w)) matches++; });
+        const isGood = words.length === 0 || (matches / words.length) >= 0.5;
+        
+        document.getElementById('mT').innerText = isGood ? "🌟 Excellent!" : "⚠️ Try Again";
+        document.getElementById('mM').innerHTML = isGood ? `Perfect! <br><br><span style="color:green">"Heard: ${heard}"</span>` : `Try again! <br><br><span style="color:red">"Heard: ${heard}"</span>`;
+        document.getElementById('modalOverlay').style.display = 'flex';
+    }
+
+    // Gacha Logic
     const QA = [
         { q: "the machine overheats", a: "let it cool down" },
         { q: "the machine stops working", a: "check the power supply" },
@@ -152,152 +259,40 @@
     ];
 
     const capsuleColors = ['#ffadad', '#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff', '#a0c4ff', '#bdb2ff', '#ffc6ff'];
-    const container = document.getElementById('capsuleContainer');
+    const capContainer = document.getElementById('capsuleContainer');
     for (let i = 0; i < 12; i++) {
         const cap = document.createElement('div');
         cap.className = 'capsule';
-        cap.style.backgroundColor = capsuleColors[i % capsuleColors.length];
-        container.appendChild(cap);
+        cap.style.backgroundColor = capsuleColors[i % 8];
+        capContainer.appendChild(cap);
     }
 
-    const studyList = document.getElementById('studyList');
+    const sList = document.getElementById('studyList');
     QA.forEach(item => {
         const li = document.createElement('li');
-        li.innerText = `If ${item.q}, ${item.a}`;
-        studyList.appendChild(li);
+        li.innerText = `If ${item.q}, ${item.a}.`;
+        sList.appendChild(li);
     });
 
-    const knob = document.getElementById('knob');
-    const outCapsule = document.getElementById('outCapsule');
-    const recordBtn = document.getElementById('recordBtn');
-    const modal = document.getElementById('modalOverlay');
-    const modalContent = document.getElementById('modalContent');
     let currentA = "";
-
-    // 噴射彩帶邏輯
-    function fireConfetti() {
-        const count = 60;
-        const defaults = { origin: { x: 0.5, y: 0.5 } };
-        
-        for (let i = 0; i < count; i++) {
-            const confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            document.body.appendChild(confetti);
-
-            const color = capsuleColors[Math.floor(Math.random() * capsuleColors.length)];
-            confetti.style.backgroundColor = color;
-            
-            // 初始位置：螢幕中間
-            const startX = window.innerWidth / 2;
-            const startY = window.innerHeight / 2;
-            
-            // 隨機噴射角度與力度
-            const angle = Math.random() * Math.PI * 2;
-            const velocity = 10 + Math.random() * 20;
-            const vx = Math.cos(angle) * velocity;
-            const vy = Math.sin(angle) * velocity;
-            
-            let posX = startX;
-            let posY = startY;
-            let gravity = 0.5;
-            let currVy = vy;
-            let opacity = 1;
-
-            const update = () => {
-                posX += vx;
-                currVy += gravity;
-                posY += currVy;
-                opacity -= 0.02;
-
-                confetti.style.left = posX + 'px';
-                confetti.style.top = posY + 'px';
-                confetti.style.opacity = opacity;
-                confetti.style.transform = `rotate(${posX}deg)`;
-
-                if (opacity > 0) {
-                    requestAnimationFrame(update);
-                } else {
-                    confetti.remove();
-                }
-            };
-            requestAnimationFrame(update);
-        }
-    }
-
-    function showPopUp(isCorrect, userSpeech = "") {
-        const titleEl = document.getElementById('modalTitle');
-        const bodyEl = document.getElementById('modalBody');
-        const footerEl = document.getElementById('modalFooter');
-        modalContent.classList.remove('shake-anim');
-
-        if (isCorrect) {
-            titleEl.innerHTML = "🌟 Excellent!";
-            bodyEl.innerHTML = "太棒了，完全正確！<br>Perfect answer!";
-            footerEl.innerHTML = `<button onclick="closeModal(true)" style="background:var(--dark); color:white; border:none; padding:12px 40px; border-radius:30px; font-size:1.1rem; cursor:pointer;">Next / 下一題</button>`;
-            modalContent.classList.add('shake-anim');
-            fireConfetti(); // 觸發噴射效果
-            speak("Excellent! Well done.");
-        } else {
-            titleEl.innerHTML = "❌ Try Again";
-            bodyEl.innerHTML = `You said: "${userSpeech}"<br>差少少，再試吓！💪`;
-            footerEl.innerHTML = `<button onclick="closeModal(false)" style="background:var(--primary); color:white; border:none; padding:12px 40px; border-radius:30px; font-size:1.1rem; cursor:pointer;">Try Again / 再試</button>`;
-        }
-        modal.style.display = 'flex';
-    }
-
-    function closeModal(isNext) {
-        modal.style.display = 'none';
-        if (isNext) {
-            recordBtn.style.display = 'none';
-            outCapsule.style.display = 'none';
-            document.querySelectorAll('.capsule').forEach(c => c.style.opacity = "1");
-        }
-    }
-
-    function speak(text) {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = 'en-US';
-        utter.rate = 0.85;
-        window.speechSynthesis.speak(utter);
-    }
+    const knob = document.getElementById('knob');
+    const outCap = document.getElementById('outCapsule');
+    const recGacha = document.getElementById('recordBtnGacha');
 
     knob.onclick = () => {
-        recordBtn.style.display = "none";
-        outCapsule.style.display = "none";
+        recGacha.style.display = "none";
+        outCap.style.display = "none";
         knob.classList.add('spin');
         setTimeout(() => {
             knob.classList.remove('spin');
-            const allCaps = document.querySelectorAll('.capsule');
-            const r = Math.floor(Math.random() * allCaps.length);
-            allCaps[r].style.opacity = "0.2";
-            outCapsule.style.background = allCaps[r].style.backgroundColor;
-            outCapsule.style.display = "block";
-            const task = QA[Math.floor(Math.random() * QA.length)];
+            outCap.style.background = capsuleColors[Math.floor(Math.random()*8)];
+            outCap.style.display = "block";
+            const task = QA[Math.floor(Math.random()*QA.length)];
             currentA = task.a;
             speak(`What should I do if ${task.q}?`);
-            recordBtn.style.display = "block";
+            recGacha.style.display = "block";
         }, 600);
     };
-
-    const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-    if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'en-US';
-        recordBtn.onclick = () => {
-            recognition.start();
-            recordBtn.innerText = "Listening...";
-            recordBtn.classList.add('listening');
-        };
-        recognition.onresult = (event) => {
-            const userSpeech = event.results[0][0].transcript.toLowerCase();
-            recognition.stop();
-            recordBtn.classList.remove('listening');
-            recordBtn.innerText = "🎤 Answer / 錄音回答";
-            showPopUp(userSpeech.includes(currentA.toLowerCase()), userSpeech);
-        };
-        recognition.onerror = () => { recognition.stop(); recordBtn.classList.remove('listening'); recordBtn.innerText = "🎤 Answer / 錄音回答"; };
-    }
 </script>
 </body>
 </html>
